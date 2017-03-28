@@ -1,3 +1,3 @@
-== Powershell Scripts
+== Azure Functions
 
-Repository for useful powershell scripts.
+Repository for useful Azure Functions.
