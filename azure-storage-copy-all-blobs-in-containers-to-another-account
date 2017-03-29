@@ -39,18 +39,25 @@ foreach($containerName in $SourceContainerNames) {
 
         try {
             $destBlob = Get-AzureStorageBlob -Blob $blob.Name -Container $containerName -Context $destinationContext -ErrorAction Stop
-            
-            Write-Output "$($blob.Name) found on destination.  Skipping."
+
+            if($blob.Length -eq $destBlob.Length) {
+                Write-Output "$($blob.Name) with same size found on destination.  Skipping."
+            } else {
+                Write-Output "$($blob.Name) with different size found on destination, creating snapshot."
+                $destBlockBlob = [Microsoft.WindowsAzure.Storage.Blob.CloudBlockBlob] $destBlob.ICloudBlob
+                $snapshot = $destBlockBlob.CreateSnapshot()
+                throw [Microsoft.WindowsAzure.Commands.Storage.Common.ResourceNotFoundException] "File size does not match."
+            }
         }
         catch [Microsoft.WindowsAzure.Commands.Storage.Common.ResourceNotFoundException] {
        
-            Write-Output "$($blob.Name) not found on destination.  Copying."
+            Write-Output "Copying $($blob.Name) to destination."
 
             $fileName = $blob.Name
             $sourceUrl = "https://$SourceStorageAccountName.blob.core.windows.net/$containerName/$fileName"
             $targetUri = $destinationContext.BlobEndPoint + $containerName + "/" + $fileName    
  
-            $blobResult = Start-AzureStorageBlobCopy -Context $sourceContext -SrcUri $sourceUrl -DestContext $destinationContext -DestContainer $containerName -DestBlob $fileName 
+            $blobResult = Start-AzureStorageBlobCopy -Context $sourceContext -SrcUri $sourceUrl -DestContext $destinationContext -DestContainer $containerName -DestBlob $fileName -Force
 
             $status = $blobResult | Get-AzureStorageBlobCopyState
 
