@@ -10,7 +10,7 @@
 ##
 ## Usage within an Azure Function requires Application Settings matching the environment variables below:
 ## Source_Storage_Account, Source_Storage_Key, Source_Containers, Destination_Storage_Account, Destination_Storage_Key
-Write-Output "PowerShell Timer trigger function executed at:$(get-date)";
+Write-Output "Azure-Storage-Copy-All-Blobs-In-Containers-To-Another-Account executed at:$(get-date)";
 
 $SourceStorageAccountName = $env:Source_Storage_Account
 $SourceStorageAccountKey = $env:Source_Storage_Key
